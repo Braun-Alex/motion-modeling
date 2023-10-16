@@ -8,8 +8,8 @@ Crystal::Crystal(int countOfCells, int countOfAtoms): cells(countOfCells, 0), to
 
 void Crystal::move(int& position, double probability) {
     assert(position >= 0);
-    assert(probability >= 0);
-    assert(probability <= 1);
+    assert(probability >= 0.0);
+    assert(probability <= 1.0);
 
     double randValue = dist(gen);
 
@@ -26,15 +26,15 @@ void Crystal::move(int& position, double probability) {
 
 void Crystal::moveAtom(int position, double probability) {
     assert(position >= 0);
-    assert(probability >= 0);
-    assert(probability <= 1);
+    assert(probability >= 0.0);
+    assert(probability <= 1.0);
     while (running) {
         int previousPosition = position;
         move(position, probability);
 
         std::unique_lock<std::mutex> lock(mtx);
-        cells[previousPosition]--;
-        cells[position]++;
+        --cells[previousPosition];
+        ++cells[position];
     }
 }
 
@@ -46,9 +46,10 @@ int Crystal::getCell(int i) {
 }
 
 void Crystal::start(double probability) {
-    assert(probability >= 0);
-    assert(probability <= 1);
+    assert(probability >= 0.0);
+    assert(probability <= 1.0);
     running = true;
+
     for (int i = 0; i < totalAtoms; i++) {
         threads.emplace_back(&Crystal::moveAtom, this, 0, probability);
     }
